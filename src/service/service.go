@@ -2,14 +2,14 @@ package service
 
 import (
 	"errors"
-	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"
+	"github.com/authnull0/user-service/src/repository"
 	"log"
 )
 
 func SignUp(user models.User) error {
-	manager := db.Postgressmanager()
-	isNotUnique, err := db.IsFieldNotUnique(manager.Db, "email", user.Email)
+	manager := repository.Postgressmanager()
+	isNotUnique, err := repository.IsFieldNotUnique(manager.Db, "email", user.Email)
 	if err != nil {
 		log.Print(err.Error())
 		return err
@@ -20,7 +20,7 @@ func SignUp(user models.User) error {
 		return errors.New("email address is already in use")
 	}
 
-	hashedPassword, err := db.HashPassword(user.Password)
+	hashedPassword, err := repository.HashPassword(user.Password)
 	if err != nil {
 		return err
 	}

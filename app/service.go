@@ -2,14 +2,14 @@ package main
 
 import (
 	"github.com/authnull0/user-service/src/controller"
-	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"
+	"github.com/authnull0/user-service/src/repository"
 	"github.com/gin-gonic/gin"
 	"log"
 )
 
 func init() {
-	Db := db.Postgressmanager()
+	Db := repository.Postgressmanager()
 	err := Db.Db.AutoMigrate(&models.User{})
 	if err != nil {
 		log.Fatalln("Unable to create table")
