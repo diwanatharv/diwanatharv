@@ -7,7 +7,7 @@ import (
 )
 
 func Makegormserver() *gorm.DB {
-	dsn := "host=localhost user=postgres password=atharv12345 dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := "host=65.109.82.187 user=kloudone password=authnull@kloudone@2007 dbname=authnull port=2514 "
 	db, err := gorm.Open(postgres.Open(dsn))
 	if err != nil {
 		log.Print(err.Error())

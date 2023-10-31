@@ -1,18 +1,18 @@
 package controller
 
 import (
-	"awesomeProject12/api/signup/service"
-	"awesomeProject12/pkg/enums"
-	"awesomeProject12/pkg/models"
-	"awesomeProject12/pkg/validation"
 	"encoding/json"
+	"github.com/authnull0/user-service/src/enums"
+	"github.com/authnull0/user-service/src/models"
+	"github.com/authnull0/user-service/src/service"
+	"github.com/authnull0/user-service/src/validation"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
 )
 
-func signup(g *gin.Context) {
+func Signup(g *gin.Context) {
 	var reqbody models.User
 	err := json.NewDecoder(g.Request.Body).Decode(&reqbody)
 	if err != nil {

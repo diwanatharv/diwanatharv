@@ -1,8 +1,8 @@
 package validation
 
 import (
-	"awesomeProject12/pkg/models"
 	"errors"
+	"github.com/authnull0/user-service/src/models"
 	"regexp"
 )
 

@@ -1,24 +1,26 @@
 package main
 
 import (
-	"awesomeProject12/api/signup/controller"
-	"awesomeProject12/pkg/data_access"
-	"awesomeProject12/pkg/models"
+	"github.com/authnull0/user-service/src/controller"
+	"github.com/authnull0/user-service/src/db"
+	"github.com/authnull0/user-service/src/models"
 	"github.com/gin-gonic/gin"
 	"log"
 )
 
 func init() {
-	Db := data_access.Postgressmanager()
+	Db := db.Postgressmanager()
 	err := Db.Db.AutoMigrate(&models.User{})
 	if err != nil {
 		log.Fatalln("Unable to create table")
 	}
 }
-
+func Makeroutes(g *gin.Engine) {
+	g.POST("/signup", controller.Signup)
+}
 func main() {
 	router := gin.Default()
-	controller.Makeroutes(router)
+	Makeroutes(router)
 	err := router.Run(":8080")
 	if err != nil {
 		log.Fatalln("Unable to start the server", err.Error())

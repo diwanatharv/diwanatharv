@@ -1,8 +1,8 @@
-package data_access
+package db
 
 import (
-	"awesomeProject12/pkg/config/postgress"
-	"awesomeProject12/pkg/models"
+	"github.com/authnull0/user-service/config/postgress"
+	"github.com/authnull0/user-service/src/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"log"

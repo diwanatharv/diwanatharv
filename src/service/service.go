@@ -1,15 +1,15 @@
 package service
 
 import (
-	"awesomeProject12/pkg/data_access"
-	"awesomeProject12/pkg/models"
 	"errors"
+	"github.com/authnull0/user-service/src/db"
+	"github.com/authnull0/user-service/src/models"
 	"log"
 )
 
 func SignUp(user models.User) error {
-	manager := data_access.Postgressmanager()
-	isNotUnique, err := data_access.IsFieldNotUnique(manager.Db, "email", user.Email)
+	manager := db.Postgressmanager()
+	isNotUnique, err := db.IsFieldNotUnique(manager.Db, "email", user.Email)
 	if err != nil {
 		log.Print(err.Error())
 		return err
@@ -20,7 +20,7 @@ func SignUp(user models.User) error {
 		return errors.New("email address is already in use")
 	}
 
-	hashedPassword, err := data_access.HashPassword(user.Password)
+	hashedPassword, err := db.HashPassword(user.Password)
 	if err != nil {
 		return err
 	}
