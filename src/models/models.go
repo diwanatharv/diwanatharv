@@ -12,3 +12,10 @@ type User struct {
 	Password        string `json:"password" validate:"required"`
 	ConfirmPassword string `json:"confirmpassword" validate:"required,eqfield=Password"`
 }
+type DatabaseConfig struct {
+	DbHost   string `yaml:"db.host"`
+	DbPort   int    `yaml:"db.port"`
+	User     string `yaml:"db.user"`
+	Password string `yaml:"db.password"`
+	DbName   string `yaml:"db.name"`
+}
