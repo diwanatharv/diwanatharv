@@ -2,18 +2,19 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
+	"net/http"
+
 	"github.com/authnull0/user-service/src/enums"
-	"github.com/authnull0/user-service/src/models"
+	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/authnull0/user-service/src/service"
 	"github.com/authnull0/user-service/src/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"log"
-	"net/http"
 )
 
 func Signup(g *gin.Context) {
-	var reqbody models.User
+	var reqbody dto.UserRequest
 	err := json.NewDecoder(g.Request.Body).Decode(&reqbody)
 	if err != nil {
 		log.Print(err.Error())
@@ -33,12 +34,12 @@ func Signup(g *gin.Context) {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "validation failed" + err.Error()})
 		return
 	}
-	err = service.SignUp(reqbody)
+	resp, err := service.SignUp(reqbody)
 	if err != nil {
 		log.Print(err.Error())
-		g.JSON(http.StatusInternalServerError, gin.H{"error": enums.ServerIssue})
+		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	g.Status(http.StatusFound)
-	g.Redirect(http.StatusFound, "/login")
+
+	g.JSON(http.StatusOK, resp)
 }

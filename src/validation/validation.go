@@ -2,8 +2,9 @@ package validation
 
 import (
 	"errors"
-	"github.com/authnull0/user-service/src/models"
 	"regexp"
+
+	"github.com/authnull0/user-service/src/models/dto"
 )
 
 func validateEmail(email string) bool {
@@ -36,16 +37,16 @@ func validatePassword(password string) bool {
 	return true
 }
 
-func Validate(u models.User) error {
+func Validate(u dto.UserRequest) error {
 	// Email validation
 	if !validateEmail(u.Email) {
 		return errors.New("invalid email address")
 	}
 
-	// Site URL validation
-	if !validateSiteURL(u.Url) {
-		return errors.New("invalid site URL")
-	}
+	// // Site URL validation
+	// if !validateSiteURL(u.Url) {
+	// 	return errors.New("invalid site URL")
+	// }
 
 	// Password validation
 	if len(u.Password) < 8 {

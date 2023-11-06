@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
 )
 
 type Postgress struct {

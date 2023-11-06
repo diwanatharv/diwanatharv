@@ -15,15 +15,13 @@ prod:
     password: authnull@kloudone@2007
     name: authnull
     schema: did
+  
+  email:
+    host: smtp.elasticemail.com
+    port: 2525
+    username: support@authnull.com
+    password: E2AA24DAB22D3996F76B2DCA9F2BFCEDD478
 
-  graphdb:
-    host: 195.201.165.12
-    port: 5432
-    user: postgres
-    password: authnull@kloudone.com
-    dbname: demodb
-    graphname: okta_graph
-    sslmode: disable
 
 
 
@@ -33,7 +31,7 @@ prod:
 #DEV PROPERTIES
 dev:
   server:
-    port: 5199
+    port: 8000
 
   db:
     host: 65.109.82.187
@@ -43,15 +41,6 @@ dev:
     name: authnull
     schema: did
 
-  graphdb:
-    host: 195.201.165.12
-    port: 5432
-    user: postgres
-    password: authnull@kloudone.com
-    dbname: demodb
-    graphname: okta-graph
-    sslmode: disable
-
 
 
 # ------------------------------------------------------
@@ -59,7 +48,7 @@ dev:
 #VERIFY PROPERTIES
 verify:
   server:
-    port: 5199
+    port: 8000
 
   db:
     host: 65.109.82.187

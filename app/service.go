@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"github.com/authnull0/user-service/src/controller"
 	"github.com/authnull0/user-service/src/models"
 	"github.com/authnull0/user-service/src/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"log"
 )
 
 var env string
@@ -22,6 +23,7 @@ func init() {
 }
 func Makeroutes(g *gin.Engine) {
 	g.POST("/signup", controller.Signup)
+
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")
