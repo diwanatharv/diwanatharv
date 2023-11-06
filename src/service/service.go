@@ -32,7 +32,7 @@ func SignUp(user dto.OrganizationRequest) (*dto.OrganizationResponse, error) {
 		}, nil
 	}
 
-	hashedPassword, err := repository.HashPassword(user.Password)
+	hashedPassword, err := repository.GenerateFromPassword(user.Password)
 	if err != nil {
 		return &dto.OrganizationResponse{
 			Code:    500,
@@ -97,8 +97,8 @@ func Login(loginRequest dto.LoginRequest) (*dto.LoginResponse, error) {
 	}
 
 	// Hash the provided password and compare it with the stored password hash
-	err = repository.Checkpassword(loginRequest.Password, user.Password)
-	if err != nil {
+	match, err := repository.ComparePasswordAndHash(loginRequest.Password, user.Password)
+	if err != nil || !match {
 		log.Print(err.Error())
 		return &dto.LoginResponse{
 			Code:    401,
