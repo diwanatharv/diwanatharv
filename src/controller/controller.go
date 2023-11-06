@@ -2,9 +2,10 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/authnull0/user-service/src/models"
 	"log"
 	"net/http"
+
+	"github.com/authnull0/user-service/src/models"
 
 	"github.com/authnull0/user-service/src/enums"
 	"github.com/authnull0/user-service/src/models/dto"
@@ -67,4 +68,26 @@ func Login(g *gin.Context) {
 	}
 
 	g.JSON(http.StatusOK, resp)
+}
+func CreateTenant(g *gin.Context) {
+	var reqbody models.Tenant
+	err := g.Bind(&reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
+		return
+	}
+	err = service.CreateTenant(reqbody)
+
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	g.JSON(200, gin.H{
+		"code":    "200",
+		"status":  "success",
+		"message": "tenant is created successfully",
+	})
+
 }

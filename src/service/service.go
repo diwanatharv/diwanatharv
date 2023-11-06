@@ -1,11 +1,13 @@
 package service
 
 import (
+	"log"
+	"time"
+
 	"github.com/authnull0/user-service/src/models"
 	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/authnull0/user-service/src/repository"
 	"github.com/authnull0/user-service/utils"
-	"log"
 )
 
 func SignUp(user dto.UserRequest) (*dto.UserResponse, error) {
@@ -108,4 +110,25 @@ func Login(loginRequest models.LoginCredentials) (*dto.UserResponse, error) {
 		Status:  "success",
 		Message: "user created successfully",
 	}, nil
+}
+func CreateTenant(tenant dto.CreateTenantRequest) error {
+
+	manager := repository.Postgressmanager()
+	var tenantBody models.Tenant
+	tenantBody.Name = tenant.TenantName
+	tenantBody.Admin = tenant.Email
+	tenantBody.Url = tenant.Url
+	tenantBody.CreatedAt = time.Now()
+	tenantBody.UpdatedAt = tenantBody.CreatedAt
+	tenantBody.Status = "active"
+
+	//insert the tenant to database
+	err := manager.Insert(&tenantBody).Error
+
+	if err != nil {
+		log.Print(err.Error())
+		return err
+	}
+
+	return nil
 }
