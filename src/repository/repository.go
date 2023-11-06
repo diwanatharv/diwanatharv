@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"log"
 
 	"github.com/authnull0/user-service/src/db"
@@ -56,4 +57,19 @@ func IsFieldNotUnique(db *gorm.DB, field string, value string) (bool, error) {
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
+}
+func GetUserByEmail(db *gorm.DB, email string) (*models.User, error) {
+	var user models.User
+	err := db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.New("No such mail exists")
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+func Checkpassword(reqpassword string, original string) error {
+	return bcrypt.CompareHashAndPassword([]byte(reqpassword), []byte(original))
 }

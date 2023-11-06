@@ -23,7 +23,7 @@ func init() {
 }
 func Makeroutes(g *gin.Engine) {
 	g.POST("/signup", controller.Signup)
-
+	g.POST("/login", controller.Login)
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")
