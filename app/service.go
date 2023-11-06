@@ -15,7 +15,12 @@ var env string
 func init() {
 	loadConfig()
 	Db := repository.Postgressmanager()
-	err := Db.Db.AutoMigrate(&models.User{})
+	err := Db.Db.AutoMigrate(&models.Organization{})
+	if err != nil {
+		log.Fatalln("Unable to create table")
+	}
+
+	err = Db.Db.AutoMigrate(&models.Tenant{})
 	if err != nil {
 		log.Fatalln("Unable to create table")
 	}
@@ -24,6 +29,7 @@ func init() {
 func Makeroutes(g *gin.Engine) {
 	g.POST("/signup", controller.Signup)
 	g.POST("/login", controller.Login)
+	g.POST("/createtenant", controller.CreateTenant)
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")

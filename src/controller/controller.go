@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/authnull0/user-service/src/models"
-
 	"github.com/authnull0/user-service/src/enums"
 	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/authnull0/user-service/src/service"
@@ -16,7 +14,7 @@ import (
 )
 
 func Signup(g *gin.Context) {
-	var reqbody dto.UserRequest
+	var reqbody dto.OrganizationRequest
 	err := json.NewDecoder(g.Request.Body).Decode(&reqbody)
 	if err != nil {
 		log.Print(err.Error())
@@ -46,7 +44,7 @@ func Signup(g *gin.Context) {
 	g.JSON(http.StatusOK, resp)
 }
 func Login(g *gin.Context) {
-	var reqbody models.LoginCredentials
+	var reqbody dto.LoginRequest
 	err := g.Bind(&reqbody)
 	if err != nil {
 		log.Print(err.Error())
@@ -70,24 +68,20 @@ func Login(g *gin.Context) {
 	g.JSON(http.StatusOK, resp)
 }
 func CreateTenant(g *gin.Context) {
-	var reqbody models.Tenant
+	var reqbody dto.CreateTenantRequest
 	err := g.Bind(&reqbody)
 	if err != nil {
 		log.Print(err.Error())
 		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
 		return
 	}
-	err = service.CreateTenant(reqbody)
+	resp, err := service.CreateTenant(reqbody)
 
 	if err != nil {
 		log.Print(err.Error())
 		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
-	g.JSON(200, gin.H{
-		"code":    "200",
-		"status":  "success",
-		"message": "tenant is created successfully",
-	})
+	g.JSON(200, resp)
 
 }

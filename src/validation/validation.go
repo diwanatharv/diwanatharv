@@ -37,7 +37,7 @@ func validatePassword(password string) bool {
 	return true
 }
 
-func Validate(u dto.UserRequest) error {
+func Validate(u dto.OrganizationRequest) error {
 	// Email validation
 	if !validateEmail(u.Email) {
 		return errors.New("invalid email address")

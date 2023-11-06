@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type User struct {
+type Organization struct {
 	Id        uint   ` json:"id"   gorm:"primary_key"`
 	FirstName string `json:"firstname" validate:"required"`
 	LastName  string `json:"lastname" validate:"required"`
@@ -15,10 +15,12 @@ type LoginCredentials struct {
 	Password string `json:"password"`
 }
 type Tenant struct {
-	Name      string    `json: "tenant_name"`
-	Admin     string    `json: "tenant_admin"`
-	Url       string    `json: "tenant_url"`
-	CreatedAt time.Time `json: "created_at"`
-	UpdatedAt time.Time `json: "updated_at"`
-	Status    string    `json:"status"`
+	Id             uint      `json:"id" gorm:"primary_key"`
+	TenantName     string    `json:"tenant_name"`
+	AdminEmail     string    `json:"admin_email"`
+	SiteURL        string    `json:"site_url"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	OrganizationId int       `json:"organization_id"`
+	Status         string    `json:"status"`
 }

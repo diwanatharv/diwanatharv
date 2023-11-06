@@ -45,7 +45,7 @@ func (p *Postgress) Unique() (tx *gorm.DB) {
 func IsFieldNotUnique(db *gorm.DB, field string, value string) (bool, error) {
 	// Get the count of records that match the field value.
 	var count int64
-	err := db.Model(&models.User{}).Where(field+" = ?", value).Count(&count).Error
+	err := db.Model(&models.Organization{}).Where(field+" = ?", value).Count(&count).Error
 	if err != nil {
 		log.Print(err.Error())
 		return false, err
@@ -58,8 +58,8 @@ func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
-func GetUserByEmail(db *gorm.DB, email string) (*models.User, error) {
-	var user models.User
+func GetUserByEmailForOrganization(db *gorm.DB, email string) (*models.Organization, error) {
+	var user models.Organization
 	err := db.Where("email = ?", email).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
