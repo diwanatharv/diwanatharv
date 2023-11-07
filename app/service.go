@@ -31,6 +31,7 @@ func Makeroutes(g *gin.Engine) {
 	var tenantcontroller controller.TenantController
 	g.POST("/orgsignup", orgcontroller.SignUp)
 	g.POST("/orglogin", orgcontroller.Login)
+	g.POST("/orgsignupverify", orgcontroller.SignUpVerify)
 	g.POST("/createtenant", tenantcontroller.CreateTenant)
 }
 func loadConfig() {

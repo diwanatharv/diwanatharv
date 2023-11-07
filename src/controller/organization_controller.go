@@ -71,3 +71,17 @@ func (o *OrganizationController) Login(g *gin.Context) {
 
 	g.JSON(http.StatusOK, resp)
 }
+
+func (o *OrganizationController) SignUpVerify(g *gin.Context) {
+	//get token from url
+	token := g.Param("token")
+
+	resp, err := orgService.SignUpVerify(token)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	g.JSON(http.StatusOK, resp)
+}

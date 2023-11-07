@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/authnull0/user-service/src/models/dto"
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/argon2"
 
 	"github.com/authnull0/user-service/src/db"
@@ -167,4 +169,31 @@ func decodeHash(encodedHash string) (p *dto.Params, salt, hash []byte, err error
 	p.KeyLength = uint32(len(hash))
 
 	return p, salt, hash, nil
+}
+
+func CreateToken(email string) (string, error) {
+	// Generate a new jwt token object, specifying signing method and the claims
+	// Your secret key (keep this secret in a production environment)
+	secretKey := []byte("Authnull")
+
+	// Create a claim with the email ID and expiration time
+	claims := jwt.MapClaims{
+		"email": email,                            // Replace with the email you want to include
+		"exp":   time.Now().Add(time.Hour).Unix(), // Set the expiration time (1 hour in this example)
+	}
+
+	// Create a token with the claims and the signing method
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Sign the token with your secret key to generate the final JWT token
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		fmt.Println("Error creating JWT token:", err)
+		return "", err
+	}
+
+	// Print the JWT token
+	fmt.Println("JWT Token:", tokenString)
+
+	return tokenString, nil
 }

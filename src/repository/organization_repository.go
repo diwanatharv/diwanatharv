@@ -52,6 +52,7 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 	users.Email = user.Email
 	users.OrgName = user.OrgName
 	users.Password = user.Password
+	users.Status = "pending"
 
 	err = manager.Insert(&users).Error
 
@@ -64,9 +65,23 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 		}, nil
 	}
 
+	// Create a new token for the newly registered user
+	token, err := CreateToken(user.Email)
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.OrganizationResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "ERROR: Failed to create token",
+		}, nil
+
+	}
+
+	url := fmt.Sprintf("http://authnull.com/verify?token=%s", token)
+
 	// Send a welcome email to the user.
 
-	message := fmt.Sprintf("<h1>Welcome to Authnull</h1><p>Hi, %s</p><p>Thank you for signing up with Authnull. We are excited to have you on board with us.</p><p>Regards,</p><p>Authnull Team</p>", user.Email)
+	message := fmt.Sprintf("<h1>Welcome to Authnull</h1><p>Hi, %s</p><p>Thank you for signing up with Authnull. We are excited to have you on board with us.</p><p>Please click on the link below to verify your email address.</p><p><a href=\"%s\">Verify Email</a></p><p>Regards,</p><p>Authnull Team</p>", user.FirstName, url)
 	val := utils.ValidateEmail(user.Email, message)
 
 	if !val {
@@ -110,6 +125,15 @@ func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.Logi
 	}
 
 	return &dto.LoginResponse{
+		Code:    200,
+		Status:  "success",
+		Message: "user created successfully",
+	}, nil
+}
+
+func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailResponse, error) {
+
+	return &dto.VerifyEmailResponse{
 		Code:    200,
 		Status:  "success",
 		Message: "user created successfully",

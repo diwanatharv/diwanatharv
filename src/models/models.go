@@ -9,6 +9,7 @@ type Organization struct {
 	Email     string `json:"email" validate:"required,email" gorm:"uniqueIndex:email"`
 	OrgName   string `json:"orgname"`
 	Password  string `json:"password" validate:"required"`
+	Status    string `json:"status"`
 }
 type LoginCredentials struct {
 	Email    string `json:"email" validate:"required,email"`

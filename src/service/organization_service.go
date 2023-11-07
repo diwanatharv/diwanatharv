@@ -30,3 +30,13 @@ func (o *OrganizationService) Login(loginRequest dto.LoginRequest) (*dto.LoginRe
 
 	return resp, nil
 }
+
+func (o *OrganizationService) SignUpVerify(token string) (*dto.VerifyEmailResponse, error) {
+	resp, err := orgRepository.SignUpVerify(token)
+	if err != nil {
+		log.Print(err.Error())
+		return resp, err
+	}
+
+	return resp, nil
+}
