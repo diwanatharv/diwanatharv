@@ -34,6 +34,7 @@ func Makeroutes(g *gin.Engine) {
 	g.POST("/orglogin", orgcontroller.Login)
 	g.POST("/orgsignupverify", orgcontroller.SignUpVerify)
 	g.POST("/createtenant", tenantcontroller.CreateTenant)
+	g.GET("/tenant-list", tenantcontroller.GetTenantList)
 	g.POST("/dashboard", dashboardcontroller.GetDashboard)
 
 }

@@ -64,3 +64,23 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 		Message: "tenant is created successfully",
 	}, nil
 }
+func (t *TenantRepository) Gettenant() (*dto.GetTenantResponse, error) {
+	var res []models.Tenant
+	manager := Postgressmanager()
+	err := manager.Find(&res).Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.GetTenantResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find tenant table",
+			Data:    res,
+		}, err
+	}
+	return &dto.GetTenantResponse{
+		Code:    200,
+		Status:  "success",
+		Message: "tenant is created successfully",
+		Data:    res,
+	}, nil
+}

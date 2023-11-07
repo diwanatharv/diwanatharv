@@ -32,3 +32,12 @@ func (t *TenantController) CreateTenant(g *gin.Context) {
 	g.JSON(200, resp)
 
 }
+func (t *TenantController) GetTenantList(g *gin.Context) {
+	resp, err := tenantService.GetTenant()
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	g.JSON(200, resp)
+}

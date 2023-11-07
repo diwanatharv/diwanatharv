@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/authnull0/user-service/src/models"
+
 type OrganizationRequest struct {
 	FirstName            string `json:"firstname" validate:"required"`
 	LastName             string `json:"lastname" validate:"required"`
@@ -52,6 +54,13 @@ type VerifyEmailResponse struct {
 	Code    int    `json:"code"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
+}
+
+type GetTenantResponse struct {
+	Code    int             `json:"code"`
+	Status  string          `json:"status"`
+	Message string          `json:"message"`
+	Data    []models.Tenant `json:"data"`
 }
 
 type DashboardRequest struct {
