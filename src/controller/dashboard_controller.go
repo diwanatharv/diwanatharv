@@ -28,3 +28,22 @@ func (d *DashboardController) GetDashboard(g *gin.Context) {
 	g.JSON(200, resp)
 
 }
+
+func (d *DashboardController) GetUserList(g *gin.Context) {
+	var reqbody dto.GetUserListRequest
+
+	err := g.Bind(&reqbody)
+	if err != nil {
+		g.JSON(400, gin.H{"error": "invalid request"})
+		return
+	}
+
+	resp, err := dashboardService.GetUserList(reqbody)
+	if err != nil {
+		g.JSON(500, gin.H{"error": "internal server error"})
+		return
+	}
+
+	g.JSON(200, resp)
+
+}

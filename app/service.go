@@ -36,6 +36,7 @@ func Makeroutes(g *gin.Engine) {
 	g.POST("/createtenant", tenantcontroller.CreateTenant)
 	g.GET("/tenantlist", tenantcontroller.GetTenantList)
 	g.POST("/dashboard", dashboardcontroller.GetDashboard)
+	g.POST("/userlist", dashboardcontroller.GetUserList)
 
 }
 func loadConfig() {

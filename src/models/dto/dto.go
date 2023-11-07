@@ -83,3 +83,14 @@ type DashboardData struct {
 type GetTenantListRequest struct {
 	Email string `json:"email" validate:"required,email"`
 }
+
+type GetUserListRequest struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type GetUserListResponse struct {
+	Code    int           `json:"code"`
+	Status  string        `json:"status"`
+	Message string        `json:"message"`
+	Data    []models.User `json:"data"`
+}

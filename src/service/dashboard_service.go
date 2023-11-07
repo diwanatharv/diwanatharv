@@ -20,3 +20,13 @@ func (d *DashboardService) GetDashboard(reqbody dto.DashboardRequest) (*dto.Dash
 
 	return resp, nil
 }
+
+func (d *DashboardService) GetUserList(reqbody dto.GetUserListRequest) (*dto.GetUserListResponse, error) {
+	resp, err := dashboardRepository.GetUserList(reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		return resp, err
+	}
+
+	return resp, nil
+}

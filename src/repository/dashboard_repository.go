@@ -64,3 +64,41 @@ func (d *DashboardRepository) GetDashboard(reqbody dto.DashboardRequest) (*dto.D
 		Data:    Data,
 	}, nil
 }
+
+func (d *DashboardRepository) GetUserList(reqbody dto.GetUserListRequest) (*dto.GetUserListResponse, error) {
+	var organization models.Organization
+	var res []models.User
+
+	db := db.Makegormserver()
+
+	err := db.Where("admin_email = ?", reqbody.Email).First(&organization).Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.GetUserListResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find organization table",
+			Data:    nil,
+		}, nil
+	}
+
+	err = db.Where("org_id = ? and status = 'active'", organization.Id).Find(&res).Error
+
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.GetUserListResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find user table",
+			Data:    nil,
+		}, err
+	}
+
+	return &dto.GetUserListResponse{
+		Code:    200,
+		Status:  "success",
+		Message: "user is created successfully",
+		Data:    res,
+	}, nil
+
+}
