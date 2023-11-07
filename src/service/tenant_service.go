@@ -21,8 +21,8 @@ func (t *TenantService) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Creat
 
 	return resp, nil
 }
-func (t *TenantService) GetTenant() (*dto.GetTenantResponse, error) {
-	resp, err := tenantRepository.Gettenant()
+func (t *TenantService) GetTenant(tenant dto.GetTenantListRequest) (*dto.GetTenantListResponse, error) {
+	resp, err := tenantRepository.Gettenant(tenant)
 	if err != nil {
 		log.Print(err.Error())
 		return resp, err

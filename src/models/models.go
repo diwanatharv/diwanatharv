@@ -3,13 +3,6 @@ package models
 import "time"
 
 type Organization struct {
-	// Id        uint   ` json:"id"   gorm:"primary_key"`
-	// FirstName string `json:"firstname" validate:"required"`
-	// LastName  string `json:"lastname" validate:"required"`
-	// Email     string `json:"email" validate:"required,email" gorm:"uniqueIndex:email"`
-	// OrgName   string `json:"orgname"`
-	// Password  string `json:"password" validate:"required"`
-	// Status    string `json:"status"`
 	Id                   uint      `json:"id" gorm:"primary_key"`
 	OrganizationName     string    `json:"organization_name"`
 	AdminEmail           string    `json:"admin_email"`

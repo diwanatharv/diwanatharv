@@ -56,7 +56,7 @@ type VerifyEmailResponse struct {
 	Message string `json:"message"`
 }
 
-type GetTenantResponse struct {
+type GetTenantListResponse struct {
 	Code    int             `json:"code"`
 	Status  string          `json:"status"`
 	Message string          `json:"message"`
@@ -78,4 +78,8 @@ type DashboardData struct {
 	TotalUsers     int `json:"total_users"`
 	TotalTenants   int `json:"total_tenants"`
 	TotalEndpoints int `json:"total_endpoints"`
+}
+
+type GetTenantListRequest struct {
+	Email string `json:"email" validate:"required,email"`
 }

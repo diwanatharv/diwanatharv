@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"
 	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/authnull0/user-service/utils"
@@ -64,20 +65,35 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 		Message: "tenant is created successfully",
 	}, nil
 }
-func (t *TenantRepository) Gettenant() (*dto.GetTenantResponse, error) {
+func (t *TenantRepository) Gettenant(req dto.GetTenantListRequest) (*dto.GetTenantListResponse, error) {
+
+	var organization models.Organization
 	var res []models.Tenant
-	manager := Postgressmanager()
-	err := manager.Find(&res).Error
+
+	db := db.Makegormserver()
+
+	err := db.Where("admin_email = ?", req.Email).First(&organization).Error
 	if err != nil {
 		log.Print(err.Error())
-		return &dto.GetTenantResponse{
+		return &dto.GetTenantListResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find organization table",
+			Data:    res,
+		}, nil
+	}
+	err = db.Where("organization_id = ?", organization.Id).Find(&res).Error
+
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.GetTenantListResponse{
 			Code:    500,
 			Status:  "failed",
 			Message: "Not able to find tenant table",
 			Data:    res,
 		}, err
 	}
-	return &dto.GetTenantResponse{
+	return &dto.GetTenantListResponse{
 		Code:    200,
 		Status:  "success",
 		Message: "tenant is created successfully",

@@ -33,7 +33,15 @@ func (t *TenantController) CreateTenant(g *gin.Context) {
 
 }
 func (t *TenantController) GetTenantList(g *gin.Context) {
-	resp, err := tenantService.GetTenant()
+	var reqbody dto.GetTenantListRequest
+	err := g.Bind(&reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
+		return
+	}
+
+	resp, err := tenantService.GetTenant(reqbody)
 	if err != nil {
 		log.Print(err.Error())
 		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
