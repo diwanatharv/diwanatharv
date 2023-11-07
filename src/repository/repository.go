@@ -6,10 +6,11 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/authnull0/user-service/src/models/dto"
-	"golang.org/x/crypto/argon2"
 	"log"
 	"strings"
+
+	"github.com/authnull0/user-service/src/models/dto"
+	"golang.org/x/crypto/argon2"
 
 	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"

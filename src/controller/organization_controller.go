@@ -13,7 +13,11 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func Signup(g *gin.Context) {
+type OrganizationController struct{}
+
+var orgService service.OrganizationService
+
+func (o *OrganizationController) SignUp(g *gin.Context) {
 	var reqbody dto.OrganizationRequest
 	err := json.NewDecoder(g.Request.Body).Decode(&reqbody)
 	if err != nil {
@@ -34,7 +38,7 @@ func Signup(g *gin.Context) {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "validation failed" + err.Error()})
 		return
 	}
-	resp, err := service.SignUp(reqbody)
+	resp, err := orgService.SignUp(reqbody)
 	if err != nil {
 		log.Print(err.Error())
 		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -43,7 +47,7 @@ func Signup(g *gin.Context) {
 
 	g.JSON(http.StatusOK, resp)
 }
-func Login(g *gin.Context) {
+func (o *OrganizationController) Login(g *gin.Context) {
 	var reqbody dto.LoginRequest
 	err := g.Bind(&reqbody)
 	if err != nil {
@@ -58,7 +62,7 @@ func Login(g *gin.Context) {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "validation failed" + err.Error()})
 		return
 	}
-	resp, err := service.Login(reqbody)
+	resp, err := orgService.Login(reqbody)
 	if err != nil {
 		log.Print(err.Error())
 		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -66,22 +70,4 @@ func Login(g *gin.Context) {
 	}
 
 	g.JSON(http.StatusOK, resp)
-}
-func CreateTenant(g *gin.Context) {
-	var reqbody dto.CreateTenantRequest
-	err := g.Bind(&reqbody)
-	if err != nil {
-		log.Print(err.Error())
-		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
-		return
-	}
-	resp, err := service.CreateTenant(reqbody)
-
-	if err != nil {
-		log.Print(err.Error())
-		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		return
-	}
-	g.JSON(200, resp)
-
 }
