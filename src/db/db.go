@@ -2,10 +2,11 @@ package db
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 func Makegormserver() *gorm.DB {
@@ -16,7 +17,8 @@ func Makegormserver() *gorm.DB {
 	host := viper.GetString(env + "db.host")
 	port := viper.GetString(env + "db.port")
 	dbname := viper.GetString(env + "db.name")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable ", host, user, password, dbname, port)
+	schema := viper.GetString(env + "db.schema")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable search_path=%s", host, user, password, dbname, port, schema)
 	db, err := gorm.Open(postgres.Open(dsn))
 	if err != nil {
 		log.Print(err.Error())

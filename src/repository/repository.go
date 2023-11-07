@@ -63,9 +63,9 @@ func IsFieldNotUnique(db *gorm.DB, field string, value string) (bool, error) {
 	// Return true if the count is greater than one, otherwise return false.
 	return count > 1, nil
 }
-func GetUserByEmailForOrganization(db *gorm.DB, email string) (*models.Organization, error) {
-	var user models.Organization
-	err := db.Where("email = ?", email).First(&user).Error
+func GetUserByEmail(db *gorm.DB, email string) (*models.User, error) {
+	var user models.User
+	err := db.Where("email_address = ?", email).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.New("No such mail exists")
@@ -196,4 +196,44 @@ func CreateToken(email string) (string, error) {
 	fmt.Println("JWT Token:", tokenString)
 
 	return tokenString, nil
+}
+
+func VerifyToken(tokenString string) (string, error) {
+	// Your secret key (keep this secret in a production environment)
+	secretKey := []byte("Authnull")
+
+	// Parse the JWT string and store the result in `token`
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Validate the signing method
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return "", fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		// Return the secret key used to sign the token
+		return secretKey, nil
+	})
+	if err != nil {
+		return "", err
+	}
+
+	//GET THE EMAIL FROM THE TOKEN
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", nil
+	}
+	email := claims["email"].(string)
+
+	return email, nil
+}
+
+func GetOrganization(email string) (*models.Organization, error) {
+	manager := Postgressmanager()
+	var organization models.Organization
+	err := manager.Db.Where("admin_email = ?", email).First(&organization).Error
+	if err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	return &organization, nil
 }

@@ -3,7 +3,9 @@ package repository
 import (
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"
 	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/authnull0/user-service/utils"
@@ -45,14 +47,36 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 
 	user.Password = hashedPassword
 
-	var users models.Organization
+	var organization models.Organization
 
-	users.FirstName = user.FirstName
-	users.LastName = user.LastName
-	users.Email = user.Email
-	users.OrgName = user.OrgName
-	users.Password = user.Password
-	users.Status = "pending"
+	organization.AdminEmail = user.Email
+	organization.OrganizationName = user.OrgName
+	organization.CreatedAt = time.Now()
+	organization.UpdatedAt = organization.CreatedAt
+	organization.Status = "pending"
+	organization.SiteURL = user.SiteURL
+	organization.AuthenticationMethod = user.AuthenticationMethod
+
+	err = manager.Insert(&organization).Error
+
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.OrganizationResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "organization creation failed",
+		}, nil
+	}
+
+	var users = models.User{
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		EmailAddress: user.Email,
+		Password:     user.Password,
+		UserRoleID:   1,
+		OrgID:        int(organization.Id),
+		Status:       "pending",
+	}
 
 	err = manager.Insert(&users).Error
 
@@ -103,7 +127,7 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.LoginResponse, error) {
 	manager := Postgressmanager()
 	// Retrieve the user's password from the database
-	user, err := GetUserByEmailForOrganization(manager.Db, loginRequest.Email)
+	user, err := GetUserByEmail(manager.Db, loginRequest.Email)
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.LoginResponse{
@@ -132,6 +156,40 @@ func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.Logi
 }
 
 func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailResponse, error) {
+
+	// Verify the token
+	val, err := VerifyToken(token)
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.VerifyEmailResponse{
+			Code:    401,
+			Status:  "failed",
+			Message: "Invalid token",
+		}, err
+	}
+
+	//update the user status to active
+	db := db.Makegormserver()
+
+	err = db.Model(&models.Organization{}).Where("email = ?", val).Update("status", "active").Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.VerifyEmailResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "ERROR: Failed to update organization status",
+		}, nil
+	}
+
+	err = db.Model(&models.User{}).Where("email_address = ?", val).Update("status", "active").Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.VerifyEmailResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "ERROR: Failed to update user status",
+		}, nil
+	}
 
 	return &dto.VerifyEmailResponse{
 		Code:    200,

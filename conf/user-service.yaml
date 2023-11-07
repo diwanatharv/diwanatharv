@@ -1,6 +1,6 @@
 # set the env to prod for production
 # set the env to dev for development
-env : prod
+env : dev
 # --------------------------------------------------
 
 # PROD PROPERTIES
@@ -38,7 +38,7 @@ dev:
     port: 2514
     user: kloudone
     password: authnull@kloudone@2007
-    name: authnull
+    name: authnull_dev
     schema: did
 
 
@@ -52,10 +52,10 @@ verify:
 
   db:
     host: 65.109.82.187
-    port: 5432
+    port: 2514
     user: kloudone
     password: authnull@kloudone@2007
-    name: authnull
+    name: authnull_dev
     schema: did
 
 # ------------------------------------------------------

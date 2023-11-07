@@ -1,12 +1,14 @@
 package dto
 
 type OrganizationRequest struct {
-	FirstName       string `json:"firstname" validate:"required"`
-	LastName        string `json:"lastname" validate:"required"`
-	Email           string `json:"email" validate:"required,email"`
-	OrgName         string `json:"orgname"`
-	Password        string `json:"password" validate:"required"`
-	ConfrimPassword string `json:"confirmpassword" validate:"required"`
+	FirstName            string `json:"firstname" validate:"required"`
+	LastName             string `json:"lastname" validate:"required"`
+	Email                string `json:"email" validate:"required,email"`
+	SiteURL              string `json:"siteurl" validate:"required"`
+	OrgName              string `json:"orgname"`
+	Password             string `json:"password" validate:"required"`
+	ConfrimPassword      string `json:"confirmpassword" validate:"required"`
+	AuthenticationMethod string `json:"authentication_method" validate:"required"`
 }
 
 type OrganizationResponse struct {
@@ -50,4 +52,21 @@ type VerifyEmailResponse struct {
 	Code    int    `json:"code"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
+}
+
+type DashboardRequest struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type DashboardResponse struct {
+	Code    int           `json:"code"`
+	Status  string        `json:"status"`
+	Message string        `json:"message"`
+	Data    DashboardData `json:"data"`
+}
+
+type DashboardData struct {
+	TotalUsers     int `json:"total_users"`
+	TotalTenants   int `json:"total_tenants"`
+	TotalEndpoints int `json:"total_endpoints"`
 }

@@ -29,10 +29,13 @@ func init() {
 func Makeroutes(g *gin.Engine) {
 	var orgcontroller controller.OrganizationController
 	var tenantcontroller controller.TenantController
+	var dashboardcontroller controller.DashboardController
 	g.POST("/orgsignup", orgcontroller.SignUp)
 	g.POST("/orglogin", orgcontroller.Login)
 	g.POST("/orgsignupverify", orgcontroller.SignUpVerify)
 	g.POST("/createtenant", tenantcontroller.CreateTenant)
+	g.POST("/dashboard", dashboardcontroller.GetDashboard)
+
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")

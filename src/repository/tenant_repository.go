@@ -22,7 +22,7 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 	tenantBody.UpdatedAt = tenantBody.CreatedAt
 	tenantBody.Status = "active"
 
-	organization, err := GetUserByEmailForOrganization(manager.Db, tenant.CreatedBy)
+	organization, err := GetOrganization(tenant.CreatedBy)
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.CreateTenantResponse{
