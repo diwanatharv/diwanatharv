@@ -23,6 +23,47 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 	tenantBody.UpdatedAt = tenantBody.CreatedAt
 	tenantBody.Status = "active"
 
+	//check if the tenant name is unique
+	isNotUnique, err := IsFieldNotUnique(manager.Db, "tenant_name", tenant.TenantName)
+
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.CreateTenantResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "ERROR: Failed to check if tenant name is unique",
+		}, nil
+	}
+
+	// If the tenant name is not unique, return an error.
+	if isNotUnique {
+		return &dto.CreateTenantResponse{
+			Code:    400,
+			Status:  "failed",
+			Message: "tenant name already exists",
+		}, nil
+	}
+
+	//check if the email is unique
+	isNotUnique, err = IsFieldNotUnique(manager.Db, "admin_email", tenant.Email)
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.CreateTenantResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "ERROR: Failed to check if email is unique",
+		}, nil
+	}
+
+	// If the email field is not unique, return an error.
+	if isNotUnique {
+		return &dto.CreateTenantResponse{
+			Code:    400,
+			Status:  "failed",
+			Message: "email already exists",
+		}, nil
+	}
+
 	organization, err := GetOrganization(tenant.CreatedBy)
 	if err != nil {
 		log.Print(err.Error())

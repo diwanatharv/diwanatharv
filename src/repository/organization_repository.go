@@ -34,6 +34,26 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 		}, nil
 	}
 
+	//check if the organization name is unique
+	isNotUnique, err = IsFieldNotUnique(manager.Db, "organization_name", user.OrgName)
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.OrganizationResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "ERROR: Failed to check if organization name is unique",
+		}, nil
+	}
+
+	// If the organization name is not unique, return an error.
+	if isNotUnique {
+		return &dto.OrganizationResponse{
+			Code:    400,
+			Status:  "failed",
+			Message: "organization name already exists",
+		}, nil
+	}
+
 	hashedPassword, err := GenerateFromPassword(user.Password)
 	if err != nil {
 		return &dto.OrganizationResponse{
