@@ -47,6 +47,8 @@ dev:
     username: support@authnull.com
     password: E2AA24DAB22D3996F76B2DCA9F2BFCEDD478
 
+  cors:
+    allowOrigin: "*"
 
 # ------------------------------------------------------
 
