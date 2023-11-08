@@ -234,6 +234,8 @@ func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailRes
 
 func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname string) (*dto.OrganizationResponse, error) {
 	var message string
+
+	var code int
 	if email != "" {
 		var u models.User
 		db := db.Makegormserver()
@@ -252,8 +254,12 @@ func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname s
 		if u.EmailAddress == email {
 			message = "email already exists"
 
+			code = 400
+
 		} else {
 			message = "email is does not exist"
+
+			code = 200
 		}
 	} else if orgname != "" {
 		var org models.Organization
@@ -272,13 +278,18 @@ func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname s
 
 		if org.OrganizationName == orgname {
 			message = "organization name already exists"
+
+			code = 400
+
 		} else {
 			message = "organization name does not exist"
+
+			code = 200
 		}
 	}
 
 	return &dto.OrganizationResponse{
-		Code:    200,
+		Code:    code,
 		Status:  "success",
 		Message: message,
 	}, nil
