@@ -34,6 +34,9 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 
 	// If the email field is not unique, return an error.
 	if u.EmailAddress == user.Email {
+
+		log.Default().Println("email on the database", u.EmailAddress)
+		log.Default().Println("email on the request", user.Email)
 		return &dto.OrganizationResponse{
 			Code:    400,
 			Status:  "failed",
@@ -104,7 +107,7 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 		LastName:     user.LastName,
 		EmailAddress: user.Email,
 		Password:     user.Password,
-		UserRoleID:   1,
+		UserRoleID:   4,
 		OrgID:        int(organization.Id),
 		Status:       "pending",
 	}
