@@ -41,6 +41,11 @@ dev:
     name: authnull_dev
     schema: did
 
+  email:
+    host: smtp.elasticemail.com
+    port: 2525
+    username: support@authnull.com
+    password: E2AA24DAB22D3996F76B2DCA9F2BFCEDD478
 
 
 # ------------------------------------------------------

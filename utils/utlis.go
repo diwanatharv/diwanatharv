@@ -24,10 +24,13 @@ func ValidateEmail(email string, message string) bool {
 
 	Credential := viper.GetString(env + ".email.password")
 
+	log.Default().Println(Host, Port, From, Credential)
+
 	m.SetBody("text/html", message)
 	d := gomail.NewDialer(Host, Port, From, Credential)
 	err := d.DialAndSend(m)
 	if err != nil {
+		log.Default().Println("Email sending failed!", err)
 		return false
 	}
 	log.Default().Println("Email sent successfully!")
