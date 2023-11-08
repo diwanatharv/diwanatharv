@@ -40,3 +40,12 @@ func (o *OrganizationService) SignUpVerify(token string) (*dto.VerifyEmailRespon
 
 	return resp, nil
 }
+func (o *OrganizationService) GetOrgList(req dto.GetOrgListRequest) (*dto.GetOrgListResponse, error) {
+	resp, err := orgRepository.GetOrgList(req)
+	if err != nil {
+		log.Print(err.Error())
+		return resp, err
+	}
+
+	return resp, nil
+}

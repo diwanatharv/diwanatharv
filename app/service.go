@@ -34,12 +34,13 @@ func Makeroutes(g *gin.Engine) {
 	g.POST("/orglogin", orgcontroller.Login)
 	g.POST("/orgsignupverify", orgcontroller.SignUpVerify)
 	g.POST("/createtenant", tenantcontroller.CreateTenant)
-	g.GET("/tenantlist", tenantcontroller.GetTenantList)
+	g.POST("/tenantlist", tenantcontroller.GetTenantList)
 	g.POST("/dashboardnooftenant", dashboardcontroller.GetNoOfTenant)
 	g.POST("/dashboardnoofuser", dashboardcontroller.GetNoOfUser)
 	g.POST("/dashboardnoofendpoints", dashboardcontroller.GetNoOfEndpoints)
 	g.POST("/userlist", dashboardcontroller.GetUserList)
 	g.POST("/endpointlist", dashboardcontroller.GetEndpointList)
+	g.POST("/orgdetail", orgcontroller.GetOrgList)
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")
