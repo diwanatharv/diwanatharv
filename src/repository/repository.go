@@ -51,18 +51,7 @@ func (p *Postgress) Delete(value interface{}, conds ...interface{}) (tx *gorm.DB
 func (p *Postgress) Unique() (tx *gorm.DB) {
 	return p.Db.Exec("ALTER TABLE User ALTER COLUMN id SET DEFAULT nextval('User');")
 }
-func IsFieldNotUnique(db *gorm.DB, field string, value string) (bool, error) {
-	// Get the count of records that match the field value.
-	var count int64
-	err := db.Model(&models.Organization{}).Where(field+" = ?", value).Count(&count).Error
-	if err != nil {
-		log.Print(err.Error())
-		return false, err
-	}
 
-	// Return true if the count is greater than one, otherwise return false.
-	return count > 1, nil
-}
 func GetUserByEmail(db *gorm.DB, email string) (*models.User, error) {
 	var user models.User
 	err := db.Where("email_address = ?", email).First(&user).Error

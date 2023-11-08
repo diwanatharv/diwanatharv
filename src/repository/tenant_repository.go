@@ -22,10 +22,10 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 	tenantBody.CreatedAt = time.Now()
 	tenantBody.UpdatedAt = tenantBody.CreatedAt
 	tenantBody.Status = "active"
+	db := db.Makegormserver()
 
 	//check if the tenant name is unique
-	isNotUnique, err := IsFieldNotUnique(manager.Db, "tenant_name", tenant.TenantName)
-
+	err := db.Where("tenant_name = ?", tenant.TenantName).Find(&tenantBody).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.CreateTenantResponse{
@@ -33,10 +33,12 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 			Status:  "failed",
 			Message: "ERROR: Failed to check if tenant name is unique",
 		}, nil
+
 	}
 
 	// If the tenant name is not unique, return an error.
-	if isNotUnique {
+
+	if tenantBody.TenantName == tenant.TenantName {
 		return &dto.CreateTenantResponse{
 			Code:    400,
 			Status:  "failed",
@@ -45,7 +47,10 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 	}
 
 	//check if the email is unique
-	isNotUnique, err = IsFieldNotUnique(manager.Db, "admin_email", tenant.Email)
+
+	var u models.User
+
+	err = db.Where("email_address = ?", tenant.Email).Find(&u).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.CreateTenantResponse{
@@ -56,7 +61,7 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 	}
 
 	// If the email field is not unique, return an error.
-	if isNotUnique {
+	if u.EmailAddress == tenant.Email {
 		return &dto.CreateTenantResponse{
 			Code:    400,
 			Status:  "failed",

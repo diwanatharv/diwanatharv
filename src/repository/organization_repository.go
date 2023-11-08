@@ -15,7 +15,13 @@ type OrganizationRepository struct{}
 
 func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.OrganizationResponse, error) {
 	manager := Postgressmanager()
-	isNotUnique, err := IsFieldNotUnique(manager.Db, "email", user.Email)
+
+	db := db.Makegormserver()
+
+	// Check if the email is unique
+	var u models.User
+
+	err := db.Where("email_address = ?", user.Email).Find(&u).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.OrganizationResponse{
@@ -23,10 +29,11 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 			Status:  "failed",
 			Message: "ERROR: Failed to check if email is unique",
 		}, nil
+
 	}
 
 	// If the email field is not unique, return an error.
-	if isNotUnique {
+	if u.EmailAddress == user.Email {
 		return &dto.OrganizationResponse{
 			Code:    400,
 			Status:  "failed",
@@ -35,7 +42,10 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 	}
 
 	//check if the organization name is unique
-	isNotUnique, err = IsFieldNotUnique(manager.Db, "organization_name", user.OrgName)
+
+	var org models.Organization
+
+	err = db.Where("organization_name = ?", user.OrgName).Find(&org).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.OrganizationResponse{
@@ -46,7 +56,8 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 	}
 
 	// If the organization name is not unique, return an error.
-	if isNotUnique {
+
+	if org.OrganizationName == user.OrgName {
 		return &dto.OrganizationResponse{
 			Code:    400,
 			Status:  "failed",
