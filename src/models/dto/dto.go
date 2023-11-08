@@ -68,16 +68,10 @@ type DashboardRequest struct {
 }
 
 type DashboardResponse struct {
-	Code    int           `json:"code"`
-	Status  string        `json:"status"`
-	Message string        `json:"message"`
-	Data    DashboardData `json:"data"`
-}
-
-type DashboardData struct {
-	TotalUsers     int `json:"total_users"`
-	TotalTenants   int `json:"total_tenants"`
-	TotalEndpoints int `json:"total_endpoints"`
+	Code    int    `json:"code"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	Data    int64  `json:"data"`
 }
 
 type GetTenantListRequest struct {
@@ -93,4 +87,15 @@ type GetUserListResponse struct {
 	Status  string        `json:"status"`
 	Message string        `json:"message"`
 	Data    []models.User `json:"data"`
+}
+
+type GetEndpointListRequest struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type GetEndpointListResponse struct {
+	Code    int                 `json:"code"`
+	Status  string              `json:"status"`
+	Message string              `json:"message"`
+	Data    []models.EpmMachine `json:"data"`
 }

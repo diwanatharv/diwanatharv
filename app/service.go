@@ -35,9 +35,11 @@ func Makeroutes(g *gin.Engine) {
 	g.POST("/orgsignupverify", orgcontroller.SignUpVerify)
 	g.POST("/createtenant", tenantcontroller.CreateTenant)
 	g.GET("/tenantlist", tenantcontroller.GetTenantList)
-	g.POST("/dashboard", dashboardcontroller.GetDashboard)
+	g.POST("/dashboardnooftenant", dashboardcontroller.GetNoOfTenant)
+	g.POST("/dashboardnoofuser", dashboardcontroller.GetNoOfUser)
+	g.POST("/dashboardnoofendpoints", dashboardcontroller.GetNoOfEndpoints)
 	g.POST("/userlist", dashboardcontroller.GetUserList)
-
+	g.POST("/endpointlist", dashboardcontroller.GetEndpointList)
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")
