@@ -41,6 +41,7 @@ func Makeroutes(g *gin.Engine) {
 	g.POST("/dashboardnoofendpoints", dashboardcontroller.GetNoOfEndpoints)
 	g.POST("/userlist", dashboardcontroller.GetUserList)
 	g.POST("/endpointlist", dashboardcontroller.GetEndpointList)
+	g.POST("/validateemailandorgname", orgcontroller.ValidateEmailAndOrgName)
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")

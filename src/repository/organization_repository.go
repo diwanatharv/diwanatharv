@@ -231,3 +231,55 @@ func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailRes
 		Message: "user created successfully",
 	}, nil
 }
+
+func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname string) (*dto.OrganizationResponse, error) {
+	var message string
+	if email != "" {
+		var u models.User
+		db := db.Makegormserver()
+		err := db.Where("email_address = ?", email).Find(&u).Error
+		if err != nil {
+			log.Print(err.Error())
+			return &dto.OrganizationResponse{
+				Code:    500,
+				Status:  "failed",
+				Message: "ERROR: Failed to check if email is unique",
+			}, nil
+		}
+
+		// If the email field is not unique, return an error.
+
+		if u.EmailAddress == email {
+			message = "email already exists"
+
+		} else {
+			message = "email is does not exist"
+		}
+	} else if orgname != "" {
+		var org models.Organization
+		db := db.Makegormserver()
+		err := db.Where("organization_name = ?", orgname).Find(&org).Error
+		if err != nil {
+			log.Print(err.Error())
+			return &dto.OrganizationResponse{
+				Code:    500,
+				Status:  "failed",
+				Message: "ERROR: Failed to check if organization name is unique",
+			}, nil
+		}
+
+		// If the organization name is not unique, return an error.
+
+		if org.OrganizationName == orgname {
+			message = "organization name already exists"
+		} else {
+			message = "organization name does not exist"
+		}
+	}
+
+	return &dto.OrganizationResponse{
+		Code:    200,
+		Status:  "success",
+		Message: message,
+	}, nil
+}

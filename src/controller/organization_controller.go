@@ -85,3 +85,22 @@ func (o *OrganizationController) SignUpVerify(g *gin.Context) {
 
 	g.JSON(http.StatusOK, resp)
 }
+
+func (o *OrganizationController) ValidateEmailAndOrgName(g *gin.Context) {
+	var reqbody dto.ValidateEmailAndOrgNameRequest
+	err := g.Bind(&reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
+		return
+	}
+
+	resp, err := orgService.ValidateEmailAndOrgName(reqbody.Email, reqbody.OrgName)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+
+	g.JSON(http.StatusOK, resp)
+}

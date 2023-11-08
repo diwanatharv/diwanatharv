@@ -40,3 +40,13 @@ func (o *OrganizationService) SignUpVerify(token string) (*dto.VerifyEmailRespon
 
 	return resp, nil
 }
+
+func (o *OrganizationService) ValidateEmailAndOrgName(email string, orgname string) (*dto.OrganizationResponse, error) {
+	resp, err := orgRepository.ValidateEmailAndOrgName(email, orgname)
+	if err != nil {
+		log.Print(err.Error())
+		return resp, err
+	}
+
+	return resp, nil
+}
