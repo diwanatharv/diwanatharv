@@ -231,6 +231,27 @@ func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailRes
 		Message: "user created successfully",
 	}, nil
 }
+func (o *OrganizationRepository) GetOrgList(req dto.GetOrgListRequest) (*dto.GetOrgListResponse, error) {
+	var res models.Organization
+
+	db := db.Makegormserver()
+	err := db.Where("admin_email = ?", req.Email).First(&res).Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.GetOrgListResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find organization table",
+			Data:    res,
+		}, err
+	}
+	return &dto.GetOrgListResponse{
+		Code:    200,
+		Status:  "success",
+		Message: "Details of organization ",
+		Data:    res,
+	}, nil
+}
 
 func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname string) (*dto.OrganizationResponse, error) {
 	var message string

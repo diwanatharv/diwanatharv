@@ -97,7 +97,7 @@ func (d *DashboardController) GetEndpointList(g *gin.Context) {
 
 	resp, err := dashboardService.GetEndpointList(reqbody)
 	if err != nil {
-		g.JSON(500, gin.H{"error": "internal server error"})
+		g.JSON(500, gin.H{"error": "enter a valid email"})
 		return
 	}
 

@@ -99,6 +99,15 @@ type GetEndpointListResponse struct {
 	Message string              `json:"message"`
 	Data    []models.EpmMachine `json:"data"`
 }
+type GetOrgListRequest struct {
+	Email string `json:"email" validate:"required,email"`
+}
+type GetOrgListResponse struct {
+	Code    int                 `json:"code"`
+	Status  string              `json:"status"`
+	Message string              `json:"message"`
+	Data    models.Organization `json:"data"`
+}
 
 type ValidateEmailAndOrgNameRequest struct {
 	Email   string `json:"email"`
