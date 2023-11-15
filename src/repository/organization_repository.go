@@ -16,9 +16,9 @@ type OrganizationRepository struct{}
 
 func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.OrganizationResponse, error) {
 
-	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
+	name := viper.GetString(viper.GetString("env") + ".db.name")
 
-	db := db.GetConnectiontoDatabaseDynamically(dbname)
+	db := db.GetConnectiontoDatabaseDynamically(name)
 
 	// Check if the email is unique
 	var u models.User
@@ -178,9 +178,9 @@ func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.Logi
 
 	var org models.Organization
 
-	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
+	name := viper.GetString(viper.GetString("env") + ".db.name")
 
-	db := db.GetConnectiontoDatabaseDynamically(dbname)
+	db := db.GetConnectiontoDatabaseDynamically(name)
 
 	err = db.Where("admin_email = ?", loginRequest.Email).First(&org).Error
 	if err != nil {
@@ -288,7 +288,7 @@ func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname s
 	var code int
 	if email != "" {
 		var u models.User
-		db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+		db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 		err := db.Where("email_address = ?", email).Find(&u).Error
 		if err != nil {
 			log.Print(err.Error())
@@ -313,7 +313,7 @@ func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname s
 		}
 	} else if orgname != "" {
 		var org models.Organization
-		db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+		db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 		err := db.Where("organization_name = ?", orgname).Find(&org).Error
 		if err != nil {
 			log.Print(err.Error())
@@ -350,9 +350,9 @@ func (o *OrganizationRepository) GetOrgList(req dto.GetOrgListRequest) (*dto.Get
 
 	offset := (req.PageNo - 1) * req.PageSize
 
-	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
+	name := viper.GetString(viper.GetString("env") + ".db.name")
 
-	db := db.GetConnectiontoDatabaseDynamically(dbname)
+	db := db.GetConnectiontoDatabaseDynamically(name)
 
 	err := db.Model(&models.Organization{}).Where("status = 'verified'").Offset(offset).Limit(req.PageSize).Find(&res).Error
 	if err != nil {
@@ -374,7 +374,7 @@ func (o *OrganizationRepository) GetOrgList(req dto.GetOrgListRequest) (*dto.Get
 }
 
 func (o *OrganizationRepository) ApproveOrg(req dto.ApproveOrgRequest) (*dto.ApproveOrgResponse, error) {
-	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
 	err := db.Model(&models.Organization{}).Where("id = ?", req.OrgId).Update("status", "approved").Error
 	if err != nil {

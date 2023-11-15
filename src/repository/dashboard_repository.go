@@ -14,7 +14,7 @@ type DashboardRepository struct{}
 func (d *DashboardRepository) GetNoOfTenant(reqbody dto.DashboardRequest) (*dto.DashboardResponse, error) {
 	var organization models.Organization
 
-	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
 	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 
@@ -57,7 +57,7 @@ func (d *DashboardRepository) GetUserList(reqbody dto.GetUserListRequest) (*dto.
 	var organization models.Organization
 	var res []models.User
 
-	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
 	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 	if err != nil {
@@ -97,7 +97,7 @@ func (d *DashboardRepository) GetUserList(reqbody dto.GetUserListRequest) (*dto.
 func (d *DashboardRepository) GetNoOfUser(reqbody dto.DashboardRequest) (*dto.DashboardResponse, error) {
 	var organization models.Organization
 
-	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
 	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 
@@ -139,7 +139,7 @@ func (d *DashboardRepository) GetNoOfUser(reqbody dto.DashboardRequest) (*dto.Da
 func (d *DashboardRepository) GetNoOfEndpoints(reqbody dto.DashboardRequest) (*dto.DashboardResponse, error) {
 	var organization models.Organization
 
-	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
 	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 
@@ -201,7 +201,7 @@ func (d *DashboardRepository) GetEndpointList(reqbody dto.GetEndpointListRequest
 
 	var res1 []models.EpmMachine
 
-	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
 	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 	if err != nil {

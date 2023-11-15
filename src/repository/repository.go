@@ -23,7 +23,7 @@ import (
 func GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 
-	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 	err := db.Where("email_address = ?", email).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -188,7 +188,7 @@ func VerifyToken(tokenString string) (string, error) {
 func GetOrganization(email string) (*models.Organization, error) {
 
 	var organization models.Organization
-	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
 	err := db.Where("admin_email = ?", email).First(&organization).Error
 	if err != nil {

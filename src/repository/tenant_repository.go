@@ -117,9 +117,9 @@ func (t *TenantRepository) Gettenant(req dto.GetTenantListRequest) (*dto.GetTena
 	var organization models.Organization
 	var res []models.Tenant
 
-	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
+	name := viper.GetString(viper.GetString("env") + ".db.name")
 
-	db2 := db.GetConnectiontoDatabaseDynamically(dbname)
+	db2 := db.GetConnectiontoDatabaseDynamically(name)
 
 	err := db2.Where("admin_email = ?", req.Email).First(&organization).Error
 	if err != nil {
