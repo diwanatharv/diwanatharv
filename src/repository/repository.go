@@ -10,50 +10,20 @@ import (
 	"strings"
 	"time"
 
+	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/argon2"
 
-	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"
 	"gorm.io/gorm"
 )
 
-type Postgress struct {
-	Db *gorm.DB
-}
-
-func Postgressmanager() *Postgress {
-	return &Postgress{Db: db.Makegormserver()}
-}
-
-type postgressmethods interface {
-	Insert(value interface{}) (tx *gorm.DB)
-	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
-	Update(values interface{}) (tx *gorm.DB)
-	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
-	UniqueId()
-}
-
-func (p *Postgress) Insert(value interface{}) (tx *gorm.DB) {
-	return p.Db.Create(value)
-}
-func (p *Postgress) Find(dest interface{}, conds ...interface{}) (tx *gorm.DB) {
-	return p.Db.Find(dest, conds...)
-}
-
-func (p *Postgress) Update(values interface{}) (tx *gorm.DB) {
-	return p.Db.Model(values).Updates(values)
-}
-func (p *Postgress) Delete(value interface{}, conds ...interface{}) (tx *gorm.DB) {
-	return p.Db.Delete(value, conds)
-}
-func (p *Postgress) Unique() (tx *gorm.DB) {
-	return p.Db.Exec("ALTER TABLE User ALTER COLUMN id SET DEFAULT nextval('User');")
-}
-
-func GetUserByEmail(db *gorm.DB, email string) (*models.User, error) {
+func GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
+
+	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 	err := db.Where("email_address = ?", email).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -216,9 +186,11 @@ func VerifyToken(tokenString string) (string, error) {
 }
 
 func GetOrganization(email string) (*models.Organization, error) {
-	manager := Postgressmanager()
+
 	var organization models.Organization
-	err := manager.Db.Where("admin_email = ?", email).First(&organization).Error
+	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+
+	err := db.Where("admin_email = ?", email).First(&organization).Error
 	if err != nil {
 		log.Print(err.Error())
 		return nil, err

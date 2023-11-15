@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/authnull0/user-service/src/controller"
-	"github.com/authnull0/user-service/src/models"
-	"github.com/authnull0/user-service/src/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -13,36 +17,26 @@ import (
 
 var env string
 
-func init() {
-	loadConfig()
-	Db := repository.Postgressmanager()
-	err := Db.Db.AutoMigrate(&models.Organization{})
-	if err != nil {
-		log.Fatalln("Unable to create table")
-	}
-
-	err = Db.Db.AutoMigrate(&models.Tenant{})
-	if err != nil {
-		log.Fatalln("Unable to create table")
-	}
-
-}
-func Makeroutes(g *gin.Engine) {
+func setupRoutes(engine *gin.Engine) *gin.Engine {
 	var orgcontroller controller.OrganizationController
 	var tenantcontroller controller.TenantController
 	var dashboardcontroller controller.DashboardController
-	g.POST("/orgsignup", orgcontroller.SignUp)
-	g.POST("/orglogin", orgcontroller.Login)
-	g.POST("/orgsignupverify", orgcontroller.SignUpVerify)
-	g.POST("/createtenant", tenantcontroller.CreateTenant)
-	g.POST("/tenantlist", tenantcontroller.GetTenantList)
-	g.POST("/dashboardnooftenant", dashboardcontroller.GetNoOfTenant)
-	g.POST("/dashboardnoofuser", dashboardcontroller.GetNoOfUser)
-	g.POST("/dashboardnoofendpoints", dashboardcontroller.GetNoOfEndpoints)
-	g.POST("/userlist", dashboardcontroller.GetUserList)
-	g.POST("/endpointlist", dashboardcontroller.GetEndpointList)
-	g.POST("/validateemailandorgname", orgcontroller.ValidateEmailAndOrgName)
-	g.POST("/orgdetail", orgcontroller.GetOrgList)
+	engine.POST("/orgsignup", orgcontroller.SignUp)
+	engine.POST("/orglogin", orgcontroller.Login)
+	engine.POST("/orgsignupverify", orgcontroller.SignUpVerify)
+	engine.POST("/orglist", orgcontroller.GetOrgList)
+	engine.POST("/approveorg", orgcontroller.ApproveOrg)
+	engine.POST("/createtenant", tenantcontroller.CreateTenant)
+	engine.POST("/tenantlist", tenantcontroller.GetTenantList)
+	engine.POST("/dashboardnooftenant", dashboardcontroller.GetNoOfTenant)
+	engine.POST("/dashboardnoofuser", dashboardcontroller.GetNoOfUser)
+	engine.POST("/dashboardnoofendpoints", dashboardcontroller.GetNoOfEndpoints)
+	engine.POST("/userlist", dashboardcontroller.GetUserList)
+	engine.POST("/endpointlist", dashboardcontroller.GetEndpointList)
+	engine.POST("/validateemailandorgname", orgcontroller.ValidateEmailAndOrgName)
+	engine.POST("/orgdetail", orgcontroller.GetOrg)
+
+	return engine
 }
 func loadConfig() {
 	viper.SetConfigName("user-service")
@@ -56,15 +50,6 @@ func loadConfig() {
 	}
 	env = viper.GetString("env") + "."
 
-}
-func main() {
-	router := gin.Default()
-	router.Use(CORSMiddleware())
-	Makeroutes(router)
-	err := router.Run(":" + viper.GetString(env+"server.port"))
-	if err != nil {
-		log.Fatalln("Unable to start the server", err.Error())
-	}
 }
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -86,4 +71,55 @@ func CORSMiddleware() gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func start() {
+	loadConfig()
+	gin.DisableConsoleColor()
+
+	r := gin.Default()
+	r.Use(CORSMiddleware())
+
+	setupRoutes(r)
+	// setupDatabase()
+	startServer(r)
+
+}
+
+// startServer - Start server
+func startServer(r *gin.Engine) {
+	srv := &http.Server{
+		Addr:    ":" + viper.GetString(env+"server.port"),
+		Handler: r,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Printf("Listen: %s\n", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	quit := make(chan os.Signal)
+	// kill (no param) default send syscall.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Default().Printf("Shutting down server...\n")
+
+	// The context is used to inform the server it has 5 seconds to finish
+	// the request it is currently handling
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Default().Printf("Server forced to shutdown: %s\n", err)
+	}
+
+	log.Default().Printf("Server exiting\n")
+}
+
+func main() {
+	start()
 }

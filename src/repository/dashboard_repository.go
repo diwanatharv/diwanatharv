@@ -6,6 +6,7 @@ import (
 	"github.com/authnull0/user-service/src/db"
 	"github.com/authnull0/user-service/src/models"
 	"github.com/authnull0/user-service/src/models/dto"
+	"github.com/spf13/viper"
 )
 
 type DashboardRepository struct{}
@@ -13,9 +14,9 @@ type DashboardRepository struct{}
 func (d *DashboardRepository) GetNoOfTenant(reqbody dto.DashboardRequest) (*dto.DashboardResponse, error) {
 	var organization models.Organization
 
-	db := db.Makegormserver()
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 
-	err := db.Where("admin_email = ?", reqbody.Email).First(&organization).Error
+	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 
 	if err != nil {
 		log.Print(err.Error())
@@ -28,6 +29,8 @@ func (d *DashboardRepository) GetNoOfTenant(reqbody dto.DashboardRequest) (*dto.
 	}
 
 	var count int64
+
+	db := db.GetConnectiontoDatabaseDynamically(organization.OrganizationName)
 
 	err = db.Model(&models.Tenant{}).Where("organization_id = ?", organization.Id).Count(&count).Error
 
@@ -44,7 +47,7 @@ func (d *DashboardRepository) GetNoOfTenant(reqbody dto.DashboardRequest) (*dto.
 	return &dto.DashboardResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "tenant is created successfully",
+		Message: "No of tenants are fetched successfully",
 		Data:    count,
 	}, nil
 
@@ -54,9 +57,9 @@ func (d *DashboardRepository) GetUserList(reqbody dto.GetUserListRequest) (*dto.
 	var organization models.Organization
 	var res []models.User
 
-	db := db.Makegormserver()
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 
-	err := db.Where("admin_email = ?", reqbody.Email).First(&organization).Error
+	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.GetUserListResponse{
@@ -65,7 +68,10 @@ func (d *DashboardRepository) GetUserList(reqbody dto.GetUserListRequest) (*dto.
 			Message: "Not able to find organization table",
 			Data:    nil,
 		}, nil
+
 	}
+
+	db := db.GetConnectiontoDatabaseDynamically(organization.OrganizationName)
 
 	err = db.Where("org_id = ? and status = 'active'", organization.Id).Find(&res).Error
 
@@ -82,7 +88,7 @@ func (d *DashboardRepository) GetUserList(reqbody dto.GetUserListRequest) (*dto.
 	return &dto.GetUserListResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "user is created successfully",
+		Message: "Users are fetched successfully",
 		Data:    res,
 	}, nil
 
@@ -91,9 +97,9 @@ func (d *DashboardRepository) GetUserList(reqbody dto.GetUserListRequest) (*dto.
 func (d *DashboardRepository) GetNoOfUser(reqbody dto.DashboardRequest) (*dto.DashboardResponse, error) {
 	var organization models.Organization
 
-	db := db.Makegormserver()
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 
-	err := db.Where("admin_email = ?", reqbody.Email).First(&organization).Error
+	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 
 	if err != nil {
 		log.Print(err.Error())
@@ -106,6 +112,8 @@ func (d *DashboardRepository) GetNoOfUser(reqbody dto.DashboardRequest) (*dto.Da
 	}
 
 	var count int64
+
+	db := db.GetConnectiontoDatabaseDynamically(organization.OrganizationName)
 
 	err = db.Model(&models.User{}).Where("org_id = ? and status = 'active'", organization.Id).Count(&count).Error
 
@@ -122,7 +130,7 @@ func (d *DashboardRepository) GetNoOfUser(reqbody dto.DashboardRequest) (*dto.Da
 	return &dto.DashboardResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "user is created successfully",
+		Message: "No of users are fetched successfully",
 		Data:    count,
 	}, nil
 
@@ -131,9 +139,9 @@ func (d *DashboardRepository) GetNoOfUser(reqbody dto.DashboardRequest) (*dto.Da
 func (d *DashboardRepository) GetNoOfEndpoints(reqbody dto.DashboardRequest) (*dto.DashboardResponse, error) {
 	var organization models.Organization
 
-	db := db.Makegormserver()
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 
-	err := db.Where("admin_email = ?", reqbody.Email).First(&organization).Error
+	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 
 	if err != nil {
 		log.Print(err.Error())
@@ -146,6 +154,8 @@ func (d *DashboardRepository) GetNoOfEndpoints(reqbody dto.DashboardRequest) (*d
 	}
 
 	var tenant []models.Tenant
+
+	db := db.GetConnectiontoDatabaseDynamically(organization.OrganizationName)
 
 	err = db.Where("organization_id = ?", organization.Id).Find(&tenant).Error
 
@@ -178,7 +188,7 @@ func (d *DashboardRepository) GetNoOfEndpoints(reqbody dto.DashboardRequest) (*d
 	return &dto.DashboardResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "user is created successfully",
+		Message: "No of endpoints are fetched successfully",
 		Data:    count,
 	}, nil
 
@@ -191,9 +201,9 @@ func (d *DashboardRepository) GetEndpointList(reqbody dto.GetEndpointListRequest
 
 	var res1 []models.EpmMachine
 
-	db := db.Makegormserver()
+	dba := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 
-	err := db.Where("admin_email = ?", reqbody.Email).First(&organization).Error
+	err := dba.Where("admin_email = ?", reqbody.Email).First(&organization).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.GetEndpointListResponse{
@@ -203,6 +213,8 @@ func (d *DashboardRepository) GetEndpointList(reqbody dto.GetEndpointListRequest
 			Data:    nil,
 		}, nil
 	}
+
+	db := db.GetConnectiontoDatabaseDynamically(organization.OrganizationName)
 
 	err = db.Where("organization_id = ?", organization.Id).Find(&tenant).Error
 
@@ -236,7 +248,7 @@ func (d *DashboardRepository) GetEndpointList(reqbody dto.GetEndpointListRequest
 	return &dto.GetEndpointListResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "user is created successfully",
+		Message: "Endpoints are fetched successfully",
 		Data:    res1,
 	}, nil
 

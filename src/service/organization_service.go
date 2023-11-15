@@ -41,8 +41,8 @@ func (o *OrganizationService) SignUpVerify(token string) (*dto.VerifyEmailRespon
 	return resp, nil
 }
 
-func (o *OrganizationService) GetOrgList(req dto.GetOrgListRequest) (*dto.GetOrgListResponse, error) {
-	resp, err := orgRepository.GetOrgList(req)
+func (o *OrganizationService) GetOrg(req dto.GetOrgRequest) (*dto.GetOrgResponse, error) {
+	resp, err := orgRepository.GetOrg(req)
 	if err != nil {
 		log.Print(err.Error())
 		return resp, err
@@ -53,6 +53,26 @@ func (o *OrganizationService) GetOrgList(req dto.GetOrgListRequest) (*dto.GetOrg
 
 func (o *OrganizationService) ValidateEmailAndOrgName(email string, orgname string) (*dto.OrganizationResponse, error) {
 	resp, err := orgRepository.ValidateEmailAndOrgName(email, orgname)
+	if err != nil {
+		log.Print(err.Error())
+		return resp, err
+	}
+
+	return resp, nil
+}
+
+func (o *OrganizationService) GetOrgList(req dto.GetOrgListRequest) (*dto.GetOrgListResponse, error) {
+	resp, err := orgRepository.GetOrgList(req)
+	if err != nil {
+		log.Print(err.Error())
+		return resp, err
+	}
+
+	return resp, nil
+}
+
+func (o *OrganizationService) ApproveOrg(req dto.ApproveOrgRequest) (*dto.ApproveOrgResponse, error) {
+	resp, err := orgRepository.ApproveOrg(req)
 	if err != nil {
 		log.Print(err.Error())
 		return resp, err

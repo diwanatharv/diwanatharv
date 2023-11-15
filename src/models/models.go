@@ -10,6 +10,7 @@ type Organization struct {
 	CreatedAt            time.Time `json:"created_at"`
 	UpdatedAt            time.Time `json:"updated_at"`
 	Status               string    `json:"status"`
+	DatabaseStatus       string    `json:"database_status"`
 	AuthenticationMethod string    `json:"authentication_method"`
 }
 type LoginCredentials struct {

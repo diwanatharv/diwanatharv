@@ -9,12 +9,13 @@ import (
 	"github.com/authnull0/user-service/src/models"
 	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/authnull0/user-service/utils"
+	"github.com/spf13/viper"
 )
 
 type TenantRepository struct{}
 
 func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.CreateTenantResponse, error) {
-	manager := Postgressmanager()
+
 	var tenantBody models.Tenant
 	tenantBody.TenantName = tenant.TenantName
 	tenantBody.AdminEmail = tenant.Email
@@ -22,10 +23,22 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 	tenantBody.CreatedAt = time.Now()
 	tenantBody.UpdatedAt = tenantBody.CreatedAt
 	tenantBody.Status = "active"
-	db := db.Makegormserver()
+	organization, err := GetOrganization(tenant.CreatedBy)
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.CreateTenantResponse{
+			Code:    401,
+			Status:  "failed",
+			Message: "User not registered",
+		}, err
+	}
+
+	tenantBody.OrganizationId = int(organization.Id)
+
+	db := db.GetConnectiontoDatabaseDynamically(organization.OrganizationName)
 
 	//check if the tenant name is unique
-	err := db.Where("tenant_name = ?", tenant.TenantName).Find(&tenantBody).Error
+	err = db.Where("tenant_name = ?", tenant.TenantName).Find(&tenantBody).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.CreateTenantResponse{
@@ -68,21 +81,9 @@ func (t *TenantRepository) CreateTenant(tenant dto.CreateTenantRequest) (*dto.Cr
 			Message: "email already exists",
 		}, nil
 	}
+	// insert the tenant into the tenant table.
 
-	organization, err := GetOrganization(tenant.CreatedBy)
-	if err != nil {
-		log.Print(err.Error())
-		return &dto.CreateTenantResponse{
-			Code:    401,
-			Status:  "failed",
-			Message: "User not registered",
-		}, err
-	}
-
-	tenantBody.OrganizationId = int(organization.Id)
-
-	//insert the tenant to database
-	err = manager.Insert(&tenantBody).Error
+	err = db.Create(&tenantBody).Error
 
 	if err != nil {
 		log.Print(err.Error())
@@ -116,9 +117,11 @@ func (t *TenantRepository) Gettenant(req dto.GetTenantListRequest) (*dto.GetTena
 	var organization models.Organization
 	var res []models.Tenant
 
-	db := db.Makegormserver()
+	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
 
-	err := db.Where("admin_email = ?", req.Email).First(&organization).Error
+	db2 := db.GetConnectiontoDatabaseDynamically(dbname)
+
+	err := db2.Where("admin_email = ?", req.Email).First(&organization).Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.GetTenantListResponse{
@@ -128,7 +131,9 @@ func (t *TenantRepository) Gettenant(req dto.GetTenantListRequest) (*dto.GetTena
 			Data:    res,
 		}, nil
 	}
-	err = db.Where("organization_id = ?", organization.Id).Find(&res).Error
+
+	db1 := db.GetConnectiontoDatabaseDynamically(organization.OrganizationName)
+	err = db1.Where("organization_id = ?", organization.Id).Find(&res).Error
 
 	if err != nil {
 		log.Print(err.Error())

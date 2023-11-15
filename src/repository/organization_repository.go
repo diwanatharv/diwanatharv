@@ -9,14 +9,16 @@ import (
 	"github.com/authnull0/user-service/src/models"
 	"github.com/authnull0/user-service/src/models/dto"
 	"github.com/authnull0/user-service/utils"
+	"github.com/spf13/viper"
 )
 
 type OrganizationRepository struct{}
 
 func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.OrganizationResponse, error) {
-	manager := Postgressmanager()
 
-	db := db.Makegormserver()
+	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
+
+	db := db.GetConnectiontoDatabaseDynamically(dbname)
 
 	// Check if the email is unique
 	var u models.User
@@ -88,10 +90,11 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 	organization.CreatedAt = time.Now()
 	organization.UpdatedAt = organization.CreatedAt
 	organization.Status = "pending"
+	organization.DatabaseStatus = "pending"
 	organization.SiteURL = user.SiteURL
 	organization.AuthenticationMethod = user.AuthenticationMethod
 
-	err = manager.Insert(&organization).Error
+	db.Create(&organization)
 
 	if err != nil {
 		log.Print(err.Error())
@@ -112,7 +115,7 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 		Status:       "pending",
 	}
 
-	err = manager.Insert(&users).Error
+	db.Create(&users)
 
 	if err != nil {
 		log.Print(err.Error())
@@ -159,9 +162,9 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 }
 
 func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.LoginResponse, error) {
-	manager := Postgressmanager()
+
 	// Retrieve the user's password from the database
-	user, err := GetUserByEmail(manager.Db, loginRequest.Email)
+	user, err := GetUserByEmail(loginRequest.Email)
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.LoginResponse{
@@ -169,6 +172,32 @@ func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.Logi
 			Status:  "failed",
 			Message: "User not registered",
 		}, err
+	}
+
+	//check if organization is approved
+
+	var org models.Organization
+
+	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
+
+	db := db.GetConnectiontoDatabaseDynamically(dbname)
+
+	err = db.Where("admin_email = ?", loginRequest.Email).First(&org).Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.LoginResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find organization table",
+		}, nil
+	}
+
+	if org.Status != "approved" {
+		return &dto.LoginResponse{
+			Code:    401,
+			Status:  "failed",
+			Message: "Organization is not approved",
+		}, nil
 	}
 
 	// Hash the provided password and compare it with the stored password hash
@@ -185,7 +214,7 @@ func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.Logi
 	return &dto.LoginResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "user created successfully",
+		Message: "user logged in successfully",
 	}, nil
 }
 
@@ -203,9 +232,9 @@ func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailRes
 	}
 
 	//update the user status to active
-	db := db.Makegormserver()
+	db := db.GetConnectiontoDatabaseDynamically("epm")
 
-	err = db.Model(&models.Organization{}).Where("email = ?", val).Update("status", "active").Error
+	err = db.Model(&models.Organization{}).Where("email = ?", val).Update("status", "verified").Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.VerifyEmailResponse{
@@ -215,7 +244,7 @@ func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailRes
 		}, nil
 	}
 
-	err = db.Model(&models.User{}).Where("email_address = ?", val).Update("status", "active").Error
+	err = db.Model(&models.User{}).Where("email_address = ?", val).Update("status", "verified").Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.VerifyEmailResponse{
@@ -228,24 +257,24 @@ func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailRes
 	return &dto.VerifyEmailResponse{
 		Code:    200,
 		Status:  "success",
-		Message: "user created successfully",
+		Message: "user verified successfully",
 	}, nil
 }
-func (o *OrganizationRepository) GetOrgList(req dto.GetOrgListRequest) (*dto.GetOrgListResponse, error) {
+func (o *OrganizationRepository) GetOrg(req dto.GetOrgRequest) (*dto.GetOrgResponse, error) {
 	var res models.Organization
 
-	db := db.Makegormserver()
+	db := db.GetConnectiontoDatabaseDynamically("epm")
 	err := db.Where("admin_email = ?", req.Email).First(&res).Error
 	if err != nil {
 		log.Print(err.Error())
-		return &dto.GetOrgListResponse{
+		return &dto.GetOrgResponse{
 			Code:    500,
 			Status:  "failed",
 			Message: "Not able to find organization table",
 			Data:    res,
 		}, err
 	}
-	return &dto.GetOrgListResponse{
+	return &dto.GetOrgResponse{
 		Code:    200,
 		Status:  "success",
 		Message: "Details of organization ",
@@ -259,7 +288,7 @@ func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname s
 	var code int
 	if email != "" {
 		var u models.User
-		db := db.Makegormserver()
+		db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 		err := db.Where("email_address = ?", email).Find(&u).Error
 		if err != nil {
 			log.Print(err.Error())
@@ -284,7 +313,7 @@ func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname s
 		}
 	} else if orgname != "" {
 		var org models.Organization
-		db := db.Makegormserver()
+		db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
 		err := db.Where("organization_name = ?", orgname).Find(&org).Error
 		if err != nil {
 			log.Print(err.Error())
@@ -313,5 +342,53 @@ func (o *OrganizationRepository) ValidateEmailAndOrgName(email string, orgname s
 		Code:    code,
 		Status:  "success",
 		Message: message,
+	}, nil
+}
+
+func (o *OrganizationRepository) GetOrgList(req dto.GetOrgListRequest) (*dto.GetOrgListResponse, error) {
+	var res []models.Organization
+
+	offset := (req.PageNo - 1) * req.PageSize
+
+	dbname := viper.GetString(viper.GetString("env") + ".db.dbname")
+
+	db := db.GetConnectiontoDatabaseDynamically(dbname)
+
+	err := db.Model(&models.Organization{}).Where("status = 'verified'").Offset(offset).Limit(req.PageSize).Find(&res).Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.GetOrgListResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find organization table",
+			Data:    res,
+		}, err
+	}
+
+	return &dto.GetOrgListResponse{
+		Code:    200,
+		Status:  "success",
+		Message: "Details of organization ",
+		Data:    res,
+	}, nil
+}
+
+func (o *OrganizationRepository) ApproveOrg(req dto.ApproveOrgRequest) (*dto.ApproveOrgResponse, error) {
+	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.dbname"))
+
+	err := db.Model(&models.Organization{}).Where("id = ?", req.OrgId).Update("status", "approved").Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.ApproveOrgResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "ERROR: Failed to update organization status",
+		}, nil
+	}
+
+	return &dto.ApproveOrgResponse{
+		Code:    200,
+		Status:  "success",
+		Message: "organization approved successfully",
 	}, nil
 }

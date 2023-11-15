@@ -85,8 +85,8 @@ func (o *OrganizationController) SignUpVerify(g *gin.Context) {
 
 	g.JSON(http.StatusOK, resp)
 }
-func (o *OrganizationController) GetOrgList(g *gin.Context) {
-	var reqbody dto.GetOrgListRequest
+func (o *OrganizationController) GetOrg(g *gin.Context) {
+	var reqbody dto.GetOrgRequest
 	err := g.Bind(&reqbody)
 	if err != nil {
 		log.Print(err.Error())
@@ -100,7 +100,7 @@ func (o *OrganizationController) GetOrgList(g *gin.Context) {
 		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
 		return
 	}
-	resp, err := orgService.GetOrgList(reqbody)
+	resp, err := orgService.GetOrg(reqbody)
 	if err != nil {
 		log.Print(err.Error())
 		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
@@ -126,4 +126,52 @@ func (o *OrganizationController) ValidateEmailAndOrgName(g *gin.Context) {
 	}
 
 	g.JSON(http.StatusOK, resp)
+}
+
+func (o *OrganizationController) GetOrgList(g *gin.Context) {
+	var reqbody dto.GetOrgListRequest
+	err := g.Bind(&reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
+		return
+	}
+	v := validator.New()
+	v.Struct(&reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
+		return
+	}
+	resp, err := orgService.GetOrgList(reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	g.JSON(200, resp)
+}
+
+func (o *OrganizationController) ApproveOrg(g *gin.Context) {
+	var reqbody dto.ApproveOrgRequest
+	err := g.Bind(&reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
+		return
+	}
+	v := validator.New()
+	v.Struct(&reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusBadRequest, gin.H{"error": enums.Invalid})
+		return
+	}
+	resp, err := orgService.ApproveOrg(reqbody)
+	if err != nil {
+		log.Print(err.Error())
+		g.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	g.JSON(200, resp)
 }
