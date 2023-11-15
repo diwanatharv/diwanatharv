@@ -18,6 +18,8 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 
 	name := viper.GetString(viper.GetString("env") + ".db.name")
 
+	log.Default().Println("database name", name)
+
 	db := db.GetConnectiontoDatabaseDynamically(name)
 
 	// Check if the email is unique
@@ -138,7 +140,9 @@ func (o *OrganizationRepository) SignUp(user dto.OrganizationRequest) (*dto.Orga
 
 	}
 
-	url := fmt.Sprintf("http://authnull.com/verify?token=%s", token)
+	verifyurl := viper.GetString(viper.GetString("env") + ".verify.url")
+
+	url := fmt.Sprintf("%s?token=%s", verifyurl, token)
 
 	// Send a welcome email to the user.
 
@@ -232,9 +236,9 @@ func (o *OrganizationRepository) SignUpVerify(token string) (*dto.VerifyEmailRes
 	}
 
 	//update the user status to active
-	db := db.GetConnectiontoDatabaseDynamically("epm")
+	db := db.GetConnectiontoDatabaseDynamically(viper.GetString(viper.GetString("env") + ".db.name"))
 
-	err = db.Model(&models.Organization{}).Where("email = ?", val).Update("status", "verified").Error
+	err = db.Model(&models.Organization{}).Where("admin_email = ?", val).Update("status", "verified").Error
 	if err != nil {
 		log.Print(err.Error())
 		return &dto.VerifyEmailResponse{

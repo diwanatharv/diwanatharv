@@ -25,6 +25,9 @@ prod:
   cors:
     allowOrigin: "*"
 
+  verify:
+    url: https://tenants.authnull.com/orgsignupverify
+
 
 
 # ------------------------------------------------------
@@ -50,6 +53,9 @@ dev:
 
   cors:
     allowOrigin: "*"
+
+  verify:
+    url: https://tenants.authnull.com/orgsignupverify
 
 # ------------------------------------------------------
 

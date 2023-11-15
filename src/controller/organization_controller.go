@@ -74,7 +74,7 @@ func (o *OrganizationController) Login(g *gin.Context) {
 
 func (o *OrganizationController) SignUpVerify(g *gin.Context) {
 	//get token from url
-	token := g.Param("token")
+	token := g.Query("token")
 
 	resp, err := orgService.SignUpVerify(token)
 	if err != nil {
@@ -83,7 +83,10 @@ func (o *OrganizationController) SignUpVerify(g *gin.Context) {
 		return
 	}
 
-	g.JSON(http.StatusOK, resp)
+	log.Default().Println("redirecting to client", resp)
+
+	g.Redirect(http.StatusMovedPermanently, "http://client.authnull.com/login")
+
 }
 func (o *OrganizationController) GetOrg(g *gin.Context) {
 	var reqbody dto.GetOrgRequest

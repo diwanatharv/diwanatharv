@@ -13,6 +13,8 @@ import (
 var once sync.Once
 var dba *gorm.DB
 
+var OrganizationDatabase map[string]*gorm.DB
+
 func GetInstance(database string) (db *gorm.DB) {
 
 	env := viper.GetString("env") + "."
@@ -22,8 +24,8 @@ func GetInstance(database string) (db *gorm.DB) {
 	host := viper.GetString(env + "db.host")
 	port := viper.GetString(env + "db.port")
 	dbname := database
-	// schema := viper.GetString(env + "db.schema")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require", host, user, password, dbname, port)
+	schema := viper.GetString(env + "db.schema")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=require search_path=%s", host, user, password, dbname, port, schema)
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dsn,
 		PreferSimpleProtocol: true,
@@ -44,8 +46,17 @@ func GetInstance(database string) (db *gorm.DB) {
 }
 
 func GetConnectiontoDatabaseDynamically(database string) (db *gorm.DB) {
-	once.Do(func() {
-		db = GetInstance(database)
-	})
+
+	if OrganizationDatabase[database] == nil {
+		once.Do(func() {
+			OrganizationDatabase = make(map[string]*gorm.DB)
+		})
+
+		OrganizationDatabase[database] = GetInstance(database)
+		return OrganizationDatabase[database]
+	} else {
+		return OrganizationDatabase[database]
+	}
+
 	return db
 }

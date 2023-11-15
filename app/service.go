@@ -23,7 +23,7 @@ func setupRoutes(engine *gin.Engine) *gin.Engine {
 	var dashboardcontroller controller.DashboardController
 	engine.POST("/orgsignup", orgcontroller.SignUp)
 	engine.POST("/orglogin", orgcontroller.Login)
-	engine.POST("/orgsignupverify", orgcontroller.SignUpVerify)
+	engine.GET("/orgsignupverify", orgcontroller.SignUpVerify)
 	engine.POST("/orglist", orgcontroller.GetOrgList)
 	engine.POST("/approveorg", orgcontroller.ApproveOrg)
 	engine.POST("/createtenant", tenantcontroller.CreateTenant)
