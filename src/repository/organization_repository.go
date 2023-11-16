@@ -215,10 +215,26 @@ func (o *OrganizationRepository) Login(loginRequest dto.LoginRequest) (*dto.Logi
 		}, err
 	}
 
+	var role models.UserRolesPermission
+
+	err = db.Where("id = ?", user.UserRoleID).First(&role).Error
+	if err != nil {
+		log.Print(err.Error())
+		return &dto.LoginResponse{
+			Code:    500,
+			Status:  "failed",
+			Message: "Not able to find user role table",
+		}, nil
+	}
+
 	return &dto.LoginResponse{
 		Code:    200,
 		Status:  "success",
 		Message: "user logged in successfully",
+		Role:    role.Role,
+		UserID:  user.UserId,
+		OrgId:   user.OrgID,
+		Email:   user.EmailAddress,
 	}, nil
 }
 

@@ -55,29 +55,6 @@ func (User) TableName() string {
 	return "did.users"
 }
 
-// CREATE TABLE did.epm_machines (
-// 	machine_id int8 NOT NULL DEFAULT nextval('did.epm_machines_seq'::regclass),
-// 	machine_key text NOT NULL,
-// 	public_ip_address varchar(512) NOT NULL,
-// 	auth_type varchar(255) NOT NULL,
-// 	private_ip_address varchar(255) NOT NULL,
-// 	os_id text NOT NULL,
-// 	status varchar(255) NOT NULL DEFAULT ''::character varying,
-// 	hostname varchar(255) NOT NULL DEFAULT ''::character varying,
-// 	ip_address varchar(255) NOT NULL DEFAULT ''::character varying,
-// 	localuser varchar(255) NOT NULL DEFAULT ''::character varying,
-// 	password_policy_id int4 NULL DEFAULT 0,
-// 	auth_code varchar(512) NOT NULL DEFAULT ''::character varying,
-// 	jump_server_id int4 NULL DEFAULT 0,
-// 	domain_id int4 NOT NULL,
-// 	vnc_password varchar(255) NOT NULL DEFAULT ''::character varying,
-// 	factors varchar(512) NULL,
-// 	status_guacd bool NULL,
-// 	status_services bool NULL,
-// 	instance_id int8 NOT NULL DEFAULT 0,
-// 	CONSTRAINT epm_machines_pkey PRIMARY KEY (machine_id)
-// );
-
 type EpmMachine struct {
 	MachineId        int64  `gorm:"column:machine_id;primary_key"`
 	MachineKey       string `gorm:"column:machine_key"`
@@ -102,4 +79,14 @@ type EpmMachine struct {
 
 type GetEndpointListRequest struct {
 	Email string `json:"email" validate:"required,email"`
+}
+
+type UserRolesPermission struct {
+	Id          int    `gorm:"column:id;primary_key"`
+	Role        string `gorm:"column:role"`
+	Permissions string `gorm:"column:permissions"`
+}
+
+func (UserRolesPermission) TableName() string {
+	return "did.user_roles_permission"
 }

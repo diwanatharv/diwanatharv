@@ -36,6 +36,10 @@ type LoginResponse struct {
 	Code    int    `json:"code"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
+	Role    string `json:"role"`
+	UserID  int    `json:"userid"`
+	Email   string `json:"email"`
+	OrgId   int    `json:"orgid"`
 }
 
 type LoginRequest struct {
