@@ -54,6 +54,9 @@ dev:
   cors:
     allowOrigin: "*"
 
+  client:
+    url: https://dev.client.did.authnull.com
+
   verify:
     url: https://tenants.authnull.com/orgsignupverify
 

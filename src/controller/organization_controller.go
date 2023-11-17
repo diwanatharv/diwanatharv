@@ -11,6 +11,7 @@ import (
 	"github.com/authnull0/user-service/src/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/spf13/viper"
 )
 
 type OrganizationController struct{}
@@ -85,7 +86,9 @@ func (o *OrganizationController) SignUpVerify(g *gin.Context) {
 
 	log.Default().Println("redirecting to client", resp)
 
-	g.Redirect(http.StatusMovedPermanently, "http://client.authnull.com/login")
+	url := viper.GetString(viper.GetString("env")+".client.url") + "/login"
+
+	g.Redirect(http.StatusMovedPermanently, url)
 
 }
 func (o *OrganizationController) GetOrg(g *gin.Context) {
